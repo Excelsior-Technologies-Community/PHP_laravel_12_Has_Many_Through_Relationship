@@ -13,7 +13,7 @@ class Post extends Model
     ];
 
     /**
-     * Post belongs to a user.
+     * Post belongs to user.
      */
     public function user(): BelongsTo
     {
