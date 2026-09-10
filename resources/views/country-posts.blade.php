@@ -14,7 +14,6 @@
         Has Many Through - Country Dashboard
     </title>
 
-    <!-- Bootstrap 5 -->
     <link
         href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
         rel="stylesheet"
@@ -35,16 +34,12 @@
             margin: 35px auto;
         }
 
-        /* =========================
-           Header
-        ========================= */
-
         .dashboard-header {
             background: #fff;
             padding: 25px;
             border-radius: 12px;
             margin-bottom: 25px;
-            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.07);
+            box-shadow: 0 3px 12px rgba(0,0,0,.07);
         }
 
         .dashboard-header h1 {
@@ -68,10 +63,6 @@
             font-weight: bold;
         }
 
-        /* =========================
-           Summary Cards
-        ========================= */
-
         .summary-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -83,7 +74,7 @@
             background: #fff;
             padding: 25px;
             border-radius: 12px;
-            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.07);
+            box-shadow: 0 3px 12px rgba(0,0,0,.07);
             text-align: center;
         }
 
@@ -104,15 +95,11 @@
             display: block;
         }
 
-        /* =========================
-           Main Section
-        ========================= */
-
         .section {
             background: #fff;
             padding: 25px;
             border-radius: 12px;
-            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.07);
+            box-shadow: 0 3px 12px rgba(0,0,0,.07);
             margin-bottom: 25px;
         }
 
@@ -130,24 +117,11 @@
             margin-top: 8px;
         }
 
-        /* =========================
-           Country Table
-        ========================= */
-
-        .table-responsive {
-            border-radius: 8px;
-        }
-
-        table {
-            vertical-align: middle !important;
-        }
-
-        th {
-            white-space: nowrap;
-        }
-
-        td {
-            vertical-align: middle;
+        .filter-box {
+            background: #f8f9fa;
+            padding: 18px;
+            border-radius: 10px;
+            margin-bottom: 20px;
         }
 
         .country-name {
@@ -175,10 +149,6 @@
             font-weight: bold;
         }
 
-        /* =========================
-           Progress Bar
-        ========================= */
-
         .percentage-wrapper {
             min-width: 160px;
         }
@@ -194,10 +164,6 @@
             border-radius: 10px;
         }
 
-        /* =========================
-           Top Contributor
-        ========================= */
-
         .top-user {
             font-weight: bold;
         }
@@ -207,15 +173,6 @@
             color: #666;
             margin-top: 3px;
         }
-
-        .trophy {
-            font-size: 18px;
-            margin-right: 5px;
-        }
-
-        /* =========================
-           View Button
-        ========================= */
 
         .view-btn {
             text-decoration: none;
@@ -232,19 +189,11 @@
             color: #fff;
         }
 
-        /* =========================
-           Empty State
-        ========================= */
-
         .empty {
             text-align: center;
             padding: 30px;
             color: #777;
         }
-
-        /* =========================
-           Responsive
-        ========================= */
 
         @media (max-width: 900px) {
 
@@ -279,9 +228,7 @@
 
 <div class="dashboard-container">
 
-    <!-- =========================
-         Dashboard Header
-    ========================== -->
+    <!-- HEADER -->
 
     <div class="dashboard-header">
 
@@ -300,17 +247,13 @@
     </div>
 
 
-    <!-- =========================
-         Summary Statistics
-    ========================== -->
+    <!-- SUMMARY -->
 
     <div class="summary-grid">
 
         <div class="summary-card">
 
-            <div class="icon">
-                🌍
-            </div>
+            <div class="icon">🌍</div>
 
             <span class="number">
                 {{ $countries->count() }}
@@ -325,9 +268,7 @@
 
         <div class="summary-card">
 
-            <div class="icon">
-                👥
-            </div>
+            <div class="icon">👥</div>
 
             <span class="number">
                 {{ $countries->sum('users_count') }}
@@ -342,9 +283,7 @@
 
         <div class="summary-card">
 
-            <div class="icon">
-                📝
-            </div>
+            <div class="icon">📝</div>
 
             <span class="number">
                 {{ $totalPosts }}
@@ -359,22 +298,93 @@
     </div>
 
 
-    <!-- =========================
-         Country Analytics
-    ========================== -->
+    <!-- SEARCH + RANKING -->
 
     <div class="section">
 
         <div class="section-header">
 
             <h2>
-                📊 Country Post Analytics
+                🔎 Search & 🏆 Country Ranking
             </h2>
 
             <p>
-                Countries ranked by total posts using the
-                <strong>hasManyThrough()</strong> relationship.
+                Search countries and rank them by users or posts.
             </p>
+
+        </div>
+
+
+        <div class="filter-box">
+
+            <form
+                method="GET"
+                action="{{ route('country.posts') }}"
+            >
+
+                <div class="row g-3">
+
+                    <div class="col-md-6">
+
+                        <label class="form-label">
+                            Search Country
+                        </label>
+
+                        <input
+                            type="text"
+                            name="search"
+                            value="{{ $search }}"
+                            class="form-control"
+                            placeholder="Search country..."
+                        >
+
+                    </div>
+
+
+                    <div class="col-md-4">
+
+                        <label class="form-label">
+                            Rank By
+                        </label>
+
+                        <select
+                            name="sort"
+                            class="form-select"
+                        >
+
+                            <option
+                                value="posts"
+                                {{ $sort === 'posts' ? 'selected' : '' }}
+                            >
+                                📝 Total Posts
+                            </option>
+
+                            <option
+                                value="users"
+                                {{ $sort === 'users' ? 'selected' : '' }}
+                            >
+                                👥 Total Users
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="col-md-2 d-flex align-items-end">
+
+                        <button
+                            type="submit"
+                            class="btn btn-primary w-100"
+                        >
+                            Search
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </form>
 
         </div>
 
@@ -390,7 +400,7 @@
                         <tr>
 
                             <th>
-                                #
+                                Rank
                             </th>
 
                             <th>
@@ -402,7 +412,7 @@
                             </th>
 
                             <th>
-                                Total Posts
+                                Posts
                             </th>
 
                             <th>
@@ -424,155 +434,129 @@
 
                     <tbody>
 
-                        @foreach($countries as $country)
+                    @foreach($countries as $country)
 
-                            <tr>
+                        <tr>
 
-                                <!-- Rank -->
+                            <td>
+                                <strong>
+                                    #{{ $loop->iteration }}
+                                </strong>
+                            </td>
 
-                                <td>
+
+                            <td>
+
+                                <span class="country-name">
+                                    {{ $country->name }}
+                                </span>
+
+                            </td>
+
+
+                            <td>
+
+                                <span class="count-badge">
+
+                                    {{ $country->users_count }}
+
+                                    {{ $country->users_count == 1
+                                        ? 'User'
+                                        : 'Users'
+                                    }}
+
+                                </span>
+
+                            </td>
+
+
+                            <td>
+
+                                <span class="post-badge">
+
+                                    {{ $country->posts_count }}
+
+                                    {{ $country->posts_count == 1
+                                        ? 'Post'
+                                        : 'Posts'
+                                    }}
+
+                                </span>
+
+                            </td>
+
+
+                            <td>
+
+                                <div class="percentage-wrapper">
+
+                                    <div class="percentage-text">
+
+                                        {{ $country->post_percentage }}%
+
+                                    </div>
+
+                                    <div class="progress">
+
+                                        <div
+                                            class="progress-bar"
+                                            style="width: {{ min($country->post_percentage, 100) }}%;"
+                                        ></div>
+
+                                    </div>
+
+                                </div>
+
+                            </td>
+
+
+                            <td>
+
+                                @if($country->top_user)
 
                                     <strong>
-                                        {{ $loop->iteration }}
+                                        🏆 {{ $country->top_user->name }}
                                     </strong>
 
-                                </td>
+                                    <div class="top-user-posts">
 
+                                        {{ $country->top_user_posts }}
 
-                                <!-- Country -->
-
-                                <td>
-
-                                    <span class="country-name">
-
-                                        {{ $country->name }}
-
-                                    </span>
-
-                                </td>
-
-
-                                <!-- Users -->
-
-                                <td>
-
-                                    <span class="count-badge">
-
-                                        {{ $country->users_count }}
-
-                                        {{ $country->users_count == 1
-                                            ? 'User'
-                                            : 'Users'
-                                        }}
-
-                                    </span>
-
-                                </td>
-
-
-                                <!-- Posts -->
-
-                                <td>
-
-                                    <span class="post-badge">
-
-                                        {{ $country->posts_count }}
-
-                                        {{ $country->posts_count == 1
+                                        {{ $country->top_user_posts == 1
                                             ? 'Post'
                                             : 'Posts'
                                         }}
 
-                                    </span>
-
-                                </td>
-
-
-                                <!-- Percentage -->
-
-                                <td>
-
-                                    <div class="percentage-wrapper">
-
-                                        <div class="percentage-text">
-
-                                            {{ $country->post_percentage }}%
-
-                                        </div>
-
-                                        <div class="progress">
-
-                                            <div
-                                                class="progress-bar"
-                                                role="progressbar"
-                                                style="width: {{ $country->post_percentage }}%;"
-                                                aria-valuenow="{{ $country->post_percentage }}"
-                                                aria-valuemin="0"
-                                                aria-valuemax="100"
-                                            >
-                                            </div>
-
-                                        </div>
-
                                     </div>
 
-                                </td>
+                                @else
+
+                                    <span class="text-muted">
+                                        No users
+                                    </span>
+
+                                @endif
+
+                            </td>
 
 
-                                <!-- Top Contributor -->
+                            <td>
 
-                                <td>
+                                <a
+                                    href="{{ route(
+                                        'country.posts.details',
+                                        $country->id
+                                    ) }}"
+                                    class="view-btn"
+                                >
+                                    View Posts
+                                </a>
 
-                                    @if($country->top_user)
+                            </td>
 
-                                        <div class="top-user">
+                        </tr>
 
-                                            <span class="trophy">
-                                                🏆
-                                            </span>
-
-                                            {{ $country->top_user->name }}
-
-                                        </div>
-
-                                        <div class="top-user-posts">
-
-                                            {{ $country->top_user_posts }}
-
-                                            {{ $country->top_user_posts == 1
-                                                ? 'Post'
-                                                : 'Posts'
-                                            }}
-
-                                        </div>
-
-                                    @else
-
-                                        <span class="text-muted">
-                                            No users
-                                        </span>
-
-                                    @endif
-
-                                </td>
-
-
-                                <!-- Action -->
-
-                                <td>
-
-                                    <a
-                                        href="{{ route('country.posts.details', $country->id) }}"
-                                        class="view-btn"
-                                    >
-                                        View Posts
-                                    </a>
-
-                                </td>
-
-                            </tr>
-
-                        @endforeach
+                    @endforeach
 
                     </tbody>
 
@@ -593,31 +577,19 @@
     </div>
 
 
-    <!-- =========================
-         Analytics Explanation
-    ========================== -->
+    <!-- EXPLANATION -->
 
     <div class="section">
 
-        <div class="section-header">
+        <h2>
+            💡 Analytics
+        </h2>
 
-            <h2>
-                💡 Relationship Analytics
-            </h2>
-
-            <p>
-                This dashboard demonstrates how Laravel's
-                <strong>hasManyThrough()</strong> relationship can
-                be used for reporting and analytics.
-            </p>
-
-        </div>
-
-        <div class="row g-3">
+        <div class="row g-3 mt-2">
 
             <div class="col-md-4">
 
-                <div class="alert alert-primary mb-0">
+                <div class="alert alert-primary">
 
                     <strong>
                         Country → Posts
@@ -625,7 +597,7 @@
 
                     <br>
 
-                    Posts are retrieved through users using
+                    Posts are retrieved through
                     <code>hasManyThrough()</code>.
 
                 </div>
@@ -635,16 +607,15 @@
 
             <div class="col-md-4">
 
-                <div class="alert alert-success mb-0">
+                <div class="alert alert-success">
 
                     <strong>
-                        Post Distribution
+                        Country Ranking
                     </strong>
 
                     <br>
 
-                    Each country's percentage of total posts
-                    is calculated automatically.
+                    Countries can be ranked by users or posts.
 
                 </div>
 
@@ -653,16 +624,15 @@
 
             <div class="col-md-4">
 
-                <div class="alert alert-warning mb-0">
+                <div class="alert alert-warning">
 
                     <strong>
-                        Top Contributors
+                        Search
                     </strong>
 
                     <br>
 
-                    Users are ranked according to their
-                    individual post counts.
+                    Quickly search countries from the dashboard.
 
                 </div>
 
@@ -673,9 +643,6 @@
     </div>
 
 </div>
-
-
-<!-- Bootstrap JS -->
 
 <script
     src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"

@@ -9,15 +9,39 @@ use App\Http\Controllers\UserController;
 |--------------------------------------------------------------------------
 */
 
-/*
- * Country statistics dashboard.
+/**
+ * Country dashboard.
+ *
+ * Search countries
+ * Country ranking
+ * User/post statistics
  */
 Route::get('/country-posts', [UserController::class, 'index'])
     ->name('country.posts');
 
-/*
- * Country-wise posts, search, pagination,
- * and users/posts details.
+
+/**
+ * Country details.
+ *
+ * Search
+ * Date filtering
+ * Pagination
+ * User contributions
+ * Growth analytics
+ * Most active user
+ * Monthly chart
+ * Post details
  */
-Route::get('/country/{country}/posts', [UserController::class, 'countryPosts'])
-    ->name('country.posts.details');
+Route::get(
+    '/country/{country}/posts',
+    [UserController::class, 'countryPosts']
+)->name('country.posts.details');
+
+
+/**
+ * CSV export.
+ */
+Route::get(
+    '/country/{country}/posts/export',
+    [UserController::class, 'exportCsv']
+)->name('country.posts.export');
