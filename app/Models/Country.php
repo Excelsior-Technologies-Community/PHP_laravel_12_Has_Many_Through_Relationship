@@ -30,10 +30,10 @@ class Country extends Model
         return $this->hasManyThrough(
             Post::class,
             User::class,
-            'country_id', // Foreign key on users table
-            'user_id',    // Foreign key on posts table
-            'id',         // Local key on countries table
-            'id'          // Local key on users table
+            'country_id',
+            'user_id',
+            'id',
+            'id'
         );
     }
 }

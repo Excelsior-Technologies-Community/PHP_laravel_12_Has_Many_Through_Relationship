@@ -11,37 +11,37 @@
     >
 
     <title>
-        {{ $country->name }} - Country Posts
+        {{ $country->name }} - Country Report
     </title>
 
-    <!-- Bootstrap 5.3.3 -->
+    <!-- Bootstrap -->
+
     <link
         href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
         rel="stylesheet"
     >
 
-    <style>
+    <!-- Chart.js -->
 
-        * {
-            box-sizing: border-box;
-        }
+    <script
+        src="https://cdn.jsdelivr.net/npm/chart.js"
+    ></script>
+
+
+    <style>
 
         body {
             margin: 0;
-            font-family: Arial, sans-serif;
             background: #f4f6f9;
+            font-family: Arial, sans-serif;
             color: #333;
         }
 
         .container-custom {
             width: 92%;
-            max-width: 1200px;
+            max-width: 1250px;
             margin: 30px auto;
         }
-
-        /* =========================
-           Header
-        ========================= */
 
         .top {
             display: flex;
@@ -60,27 +60,31 @@
             color: #666;
         }
 
-        .back-btn {
+        .btn-custom {
             text-decoration: none;
-            background: #555;
-            color: #fff;
-            padding: 10px 16px;
+            color: white;
+            padding: 10px 15px;
             border-radius: 7px;
-            transition: 0.2s;
+            display: inline-block;
+            border: none;
+            cursor: pointer;
         }
 
-        .back-btn:hover {
-            background: #333;
-            color: #fff;
+        .back-btn {
+            background: #555;
         }
 
-        /* =========================
-           Summary Cards
-        ========================= */
+        .export-btn {
+            background: #198754;
+        }
+
+        .print-btn {
+            background: #6f42c1;
+        }
 
         .summary {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(4, 1fr);
             gap: 15px;
             margin-bottom: 25px;
         }
@@ -90,12 +94,12 @@
             padding: 20px;
             border-radius: 10px;
             text-align: center;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.07);
+            box-shadow: 0 3px 10px rgba(0,0,0,.07);
         }
 
         .summary-card strong {
             display: block;
-            font-size: 28px;
+            font-size: 27px;
             margin-bottom: 5px;
         }
 
@@ -103,71 +107,24 @@
             color: #666;
         }
 
-        /* =========================
-           Sections
-        ========================= */
-
         .section {
             background: #fff;
             padding: 25px;
             border-radius: 10px;
             margin-bottom: 25px;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.07);
+            box-shadow: 0 3px 10px rgba(0,0,0,.07);
         }
 
         .section h2 {
             margin-top: 0;
         }
 
-        /* =========================
-           Search
-        ========================= */
-
-        .search-form {
-            display: flex;
-            gap: 10px;
+        .filter-box {
+            background: #f8f9fa;
+            padding: 18px;
+            border-radius: 10px;
             margin-bottom: 20px;
         }
-
-        .search-form input {
-            flex: 1;
-            padding: 12px;
-            border: 1px solid #ccc;
-            border-radius: 7px;
-            font-size: 15px;
-        }
-
-        .search-btn {
-            border: none;
-            background: #2563eb;
-            color: white;
-            padding: 12px 20px;
-            border-radius: 7px;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        .search-btn:hover {
-            background: #1d4ed8;
-        }
-
-        .clear-btn {
-            text-decoration: none;
-            background: #777;
-            color: white;
-            padding: 12px 18px;
-            border-radius: 7px;
-            transition: 0.2s;
-        }
-
-        .clear-btn:hover {
-            background: #555;
-            color: #fff;
-        }
-
-        /* =========================
-           Tables
-        ========================= */
 
         .table-wrapper {
             overflow-x: auto;
@@ -184,6 +141,7 @@
             border-bottom: 1px solid #eee;
             text-align: left;
             white-space: nowrap;
+            vertical-align: middle;
         }
 
         th {
@@ -194,10 +152,6 @@
             background: #fafafa;
         }
 
-        /* =========================
-           Badges
-        ========================= */
-
         .badge-custom {
             display: inline-block;
             padding: 5px 10px;
@@ -207,9 +161,40 @@
             font-size: 13px;
         }
 
-        /* =========================
-           Empty State
-        ========================= */
+        .contribution-bar {
+            min-width: 150px;
+        }
+
+        .small-text {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 4px;
+        }
+
+        .stat-number {
+            font-size: 30px;
+            font-weight: bold;
+        }
+
+        .growth-up {
+            color: #198754;
+            font-weight: bold;
+        }
+
+        .growth-down {
+            color: #dc3545;
+            font-weight: bold;
+        }
+
+        .most-active {
+            background: #fff8e1;
+            border-left: 5px solid #ffc107;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 350px;
+        }
 
         .empty {
             padding: 20px;
@@ -219,9 +204,18 @@
             border-radius: 7px;
         }
 
-        /* =========================
-           Bootstrap Pagination
-        ========================= */
+        .post-view-btn {
+            border: none;
+            background: #2563eb;
+            color: white;
+            padding: 7px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .post-view-btn:hover {
+            background: #1d4ed8;
+        }
 
         .pagination-wrapper {
             display: flex;
@@ -232,14 +226,13 @@
             flex-wrap: wrap;
         }
 
-        .pagination-info {
-            color: #666;
-            font-size: 14px;
-        }
+        @media (max-width: 1000px) {
 
-        /* =========================
-           Responsive
-        ========================= */
+            .summary {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+        }
 
         @media (max-width: 700px) {
 
@@ -252,22 +245,41 @@
                 align-items: flex-start;
             }
 
-            .search-form {
-                flex-direction: column;
+        }
+
+
+        /* =========================
+           PRINT
+        ========================= */
+
+        @media print {
+
+            body {
+                background: white;
             }
 
-            .section {
-                overflow-x: hidden;
+            .no-print,
+            .filter-box,
+            .pagination-wrapper,
+            button,
+            a {
+                display: none !important;
             }
 
-            .pagination-wrapper {
-                flex-direction: column;
-                align-items: center;
+            .container-custom {
+                width: 100%;
+                max-width: none;
+                margin: 0;
             }
 
-            .pagination {
-                justify-content: center;
-                flex-wrap: wrap;
+            .section,
+            .summary-card {
+                box-shadow: none;
+                border: 1px solid #ddd;
+            }
+
+            .chart-container {
+                height: 300px;
             }
 
         }
@@ -276,20 +288,22 @@
 
 </head>
 
+
 <body>
 
 <div class="container-custom">
 
+
     <!-- =========================
-         Header
+         HEADER
     ========================== -->
 
-    <div class="top">
+    <div class="top no-print">
 
         <div>
 
             <h1>
-                {{ $country->name }}
+                🌍 {{ $country->name }}
             </h1>
 
             <p>
@@ -298,21 +312,65 @@
 
         </div>
 
-        <a
-            href="{{ route('country.posts') }}"
-            class="back-btn"
-        >
-            ← All Countries
-        </a>
+
+        <div class="d-flex gap-2 flex-wrap">
+
+            <a
+                href="{{ route('country.posts') }}"
+                class="btn-custom back-btn"
+            >
+                ← All Countries
+            </a>
+
+
+            <a
+                href="{{ route(
+                    'country.posts.export',
+                    $country->id
+                ) . '?' . http_build_query([
+                    'search' => $search,
+                    'from_date' => $fromDate,
+                    'to_date' => $toDate,
+                ]) }}"
+                class="btn-custom export-btn"
+            >
+                📥 Export CSV
+            </a>
+
+
+            <button
+                onclick="window.print()"
+                class="btn-custom print-btn"
+            >
+                🖨️ Print Report
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- PRINT TITLE -->
+
+    <div class="d-none d-print-block mb-4">
+
+        <h1>
+            {{ $country->name }} - Country Post Report
+        </h1>
+
+        <p>
+            Generated on {{ now()->format('d M Y H:i') }}
+        </p>
 
     </div>
 
 
     <!-- =========================
-         Statistics
+         SUMMARY
     ========================== -->
 
     <div class="summary">
+
 
         <div class="summary-card">
 
@@ -343,18 +401,156 @@
         <div class="summary-card">
 
             <strong>
-                {{ $country->users_count > 0
-                    ? number_format(
-                        $country->posts_count / $country->users_count,
-                        1
-                    )
-                    : 0
-                }}
+                {{ $currentMonthPosts }}
             </strong>
 
             <span>
-                Avg. Posts / User
+                Current Month Posts
             </span>
+
+        </div>
+
+
+        <div class="summary-card">
+
+            <strong
+                class="{{ $growthPercentage >= 0
+                    ? 'text-success'
+                    : 'text-danger'
+                }}"
+            >
+                {{ $growthPercentage > 0 ? '+' : '' }}
+                {{ $growthPercentage }}%
+            </strong>
+
+            <span>
+                Monthly Growth
+            </span>
+
+        </div>
+
+
+    </div>
+
+
+    <!-- =========================
+         DATE + SEARCH FILTER
+    ========================== -->
+
+    <div class="section no-print">
+
+        <h2>
+            🔎 Search & 📅 Date Filter
+        </h2>
+
+        <p>
+            Filter posts by name and created date.
+        </p>
+
+
+        <div class="filter-box">
+
+            <form
+                method="GET"
+                action="{{ route(
+                    'country.posts.details',
+                    $country->id
+                ) }}"
+            >
+
+                <div class="row g-3">
+
+
+                    <!-- Search -->
+
+                    <div class="col-md-4">
+
+                        <label class="form-label">
+                            Search Post
+                        </label>
+
+                        <input
+                            type="text"
+                            name="search"
+                            value="{{ $search }}"
+                            class="form-control"
+                            placeholder="Search post name..."
+                        >
+
+                    </div>
+
+
+                    <!-- From -->
+
+                    <div class="col-md-3">
+
+                        <label class="form-label">
+                            From Date
+                        </label>
+
+                        <input
+                            type="date"
+                            name="from_date"
+                            value="{{ $fromDate }}"
+                            class="form-control"
+                        >
+
+                    </div>
+
+
+                    <!-- To -->
+
+                    <div class="col-md-3">
+
+                        <label class="form-label">
+                            To Date
+                        </label>
+
+                        <input
+                            type="date"
+                            name="to_date"
+                            value="{{ $toDate }}"
+                            class="form-control"
+                        >
+
+                    </div>
+
+
+                    <!-- Buttons -->
+
+                    <div class="col-md-2 d-flex align-items-end gap-2">
+
+                        <button
+                            type="submit"
+                            class="btn btn-primary w-100"
+                        >
+                            Filter
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                @if($search || $fromDate || $toDate)
+
+                    <div class="mt-3">
+
+                        <a
+                            href="{{ route(
+                                'country.posts.details',
+                                $country->id
+                            ) }}"
+                            class="btn btn-secondary"
+                        >
+                            Clear Filters
+                        </a>
+
+                    </div>
+
+                @endif
+
+            </form>
 
         </div>
 
@@ -362,61 +558,211 @@
 
 
     <!-- =========================
-         Country Posts
-         Search + Pagination
+         GROWTH ANALYTICS
     ========================== -->
 
     <div class="section">
 
         <h2>
-            🔎 Country Posts
+            📈 Growth Analytics
+        </h2>
+
+        <div class="row g-3 mt-2">
+
+
+            <div class="col-md-4">
+
+                <div class="card border-0 bg-light p-3">
+
+                    <div class="small-text">
+                        Current Month
+                    </div>
+
+                    <div class="stat-number">
+                        {{ $currentMonthPosts }}
+                    </div>
+
+                    <div>
+                        Posts
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="col-md-4">
+
+                <div class="card border-0 bg-light p-3">
+
+                    <div class="small-text">
+                        Previous Month
+                    </div>
+
+                    <div class="stat-number">
+                        {{ $previousMonthPosts }}
+                    </div>
+
+                    <div>
+                        Posts
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="col-md-4">
+
+                <div class="card border-0 p-3
+                    {{ $growthPercentage >= 0
+                        ? 'bg-success-subtle'
+                        : 'bg-danger-subtle'
+                    }}"
+                >
+
+                    <div class="small-text">
+                        Growth
+                    </div>
+
+                    <div
+                        class="stat-number
+                        {{ $growthPercentage >= 0
+                            ? 'text-success'
+                            : 'text-danger'
+                        }}"
+                    >
+
+                        {{ $growthPercentage > 0 ? '+' : '' }}
+                        {{ $growthPercentage }}%
+
+                    </div>
+
+                    <div>
+
+                        {{ $growthPercentage >= 0
+                            ? 'Growth'
+                            : 'Decline'
+                        }}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================
+         MOST ACTIVE USER
+    ========================== -->
+
+    <div class="section most-active">
+
+        <h2>
+            🔥 Most Active User
+        </h2>
+
+
+        @if($mostActiveUser)
+
+            <div class="row align-items-center">
+
+                <div class="col-md-8">
+
+                    <h3>
+                        🏆 {{ $mostActiveUser->name }}
+                    </h3>
+
+                    <p class="mb-1">
+
+                        {{ $mostActiveUser->email }}
+
+                    </p>
+
+                    <strong>
+
+                        {{ $mostActiveUser->posts_count }}
+
+                        {{ $mostActiveUser->posts_count == 1
+                            ? 'Post'
+                            : 'Posts'
+                        }}
+
+                    </strong>
+
+                </div>
+
+
+                <div class="col-md-4 text-md-end">
+
+                    <div class="stat-number">
+
+                        {{ $mostActiveUser->contribution_percentage }}%
+
+                    </div>
+
+                    <div>
+                        Contribution
+                    </div>
+
+                </div>
+
+            </div>
+
+        @else
+
+            <p class="text-muted mb-0">
+                No active user found.
+            </p>
+
+        @endif
+
+    </div>
+
+
+    <!-- =========================
+         MONTHLY CHART
+    ========================== -->
+
+    <div class="section">
+
+        <h2>
+            📊 Monthly Post Activity
         </h2>
 
         <p>
-            Posts retrieved using the
-            <strong>hasManyThrough()</strong>
-            relationship.
+            Post activity for the last 12 months.
         </p>
 
 
-        <!-- Search Form -->
+        <div class="chart-container">
 
-        <form
-            method="GET"
-            action="{{ route('country.posts.details', $country->id) }}"
-            class="search-form"
-        >
+            <canvas id="postActivityChart"></canvas>
 
-            <input
-                type="text"
-                name="search"
-                value="{{ $search }}"
-                placeholder="Search posts by name..."
-            >
+        </div>
 
-            <button
-                type="submit"
-                class="search-btn"
-            >
-                Search
-            </button>
+    </div>
 
 
-            @if($search)
+    <!-- =========================
+         POSTS
+    ========================== -->
 
-                <a
-                    href="{{ route('country.posts.details', $country->id) }}"
-                    class="clear-btn"
-                >
-                    Clear
-                </a>
+    <div class="section">
 
-            @endif
+        <h2>
+            📝 Country Posts
+        </h2>
 
-        </form>
+        <p>
+            Posts retrieved using
+            <strong>hasManyThrough()</strong>.
+        </p>
 
-
-        <!-- Posts -->
 
         @if($posts->count())
 
@@ -433,7 +779,7 @@
                             </th>
 
                             <th>
-                                Post Name
+                                Post
                             </th>
 
                             <th>
@@ -444,6 +790,10 @@
                                 Created
                             </th>
 
+                            <th class="no-print">
+                                Action
+                            </th>
+
                         </tr>
 
                     </thead>
@@ -451,37 +801,70 @@
 
                     <tbody>
 
-                        @foreach($posts as $post)
+                    @foreach($posts as $post)
 
-                            <tr>
+                        <tr>
 
-                                <td>
-                                    {{ $posts->firstItem() + $loop->index }}
-                                </td>
+                            <td>
+                                {{ $posts->firstItem() + $loop->index }}
+                            </td>
 
-                                <td>
 
-                                    <strong>
-                                        {{ $post->name }}
-                                    </strong>
+                            <td>
 
-                                </td>
+                                <strong>
+                                    {{ $post->name }}
+                                </strong>
 
-                                <td>
+                            </td>
 
-                                    <span class="badge-custom">
-                                        {{ $post->user->name }}
-                                    </span>
 
-                                </td>
+                            <td>
 
-                                <td>
-                                    {{ $post->created_at->format('d M Y') }}
-                                </td>
+                                <span class="badge-custom">
 
-                            </tr>
+                                    {{ $post->user->name ?? 'N/A' }}
 
-                        @endforeach
+                                </span>
+
+                            </td>
+
+
+                            <td>
+
+                                {{ $post->created_at
+                                    ? $post->created_at->format('d M Y')
+                                    : 'N/A'
+                                }}
+
+                            </td>
+
+
+                            <td class="no-print">
+
+                                <button
+                                    type="button"
+                                    class="post-view-btn"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#postModal"
+                                    data-id="{{ $post->id }}"
+                                    data-name="{{ $post->name }}"
+                                    data-author="{{ $post->user->name ?? 'N/A' }}"
+                                    data-email="{{ $post->user->email ?? 'N/A' }}"
+                                    data-country="{{ $country->name }}"
+                                    data-date="{{ $post->created_at
+                                        ? $post->created_at->format('d M Y H:i')
+                                        : 'N/A'
+                                    }}"
+                                >
+                                    📋 Details
+                                </button>
+
+                            </td>
+
+                        </tr>
+
+                    @endforeach
 
                     </tbody>
 
@@ -490,13 +873,11 @@
             </div>
 
 
-            <!-- =========================
-                 Bootstrap Pagination
-            ========================== -->
+            <!-- PAGINATION -->
 
-            <div class="pagination-wrapper">
+            <div class="pagination-wrapper no-print">
 
-                <div class="pagination-info">
+                <div>
 
                     Showing
 
@@ -529,17 +910,13 @@
 
             </div>
 
-
         @else
 
             <div class="empty">
 
-                @if($search)
+                @if($search || $fromDate || $toDate)
 
-                    No posts found for
-                    <strong>
-                        "{{ $search }}"
-                    </strong>.
+                    No posts found for the selected filters.
 
                 @else
 
@@ -555,25 +932,17 @@
 
 
     <!-- =========================
-         Users & Their Posts
+         USER CONTRIBUTIONS
     ========================== -->
 
     <div class="section">
 
         <h2>
-            👤 Users & Their Posts
+            👤 User Contributions
         </h2>
 
         <p>
-
-            Users belonging to
-
-            <strong>
-                {{ $country->name }}
-            </strong>
-
-            and their individual post counts.
-
+            Each user's percentage of this country's total posts.
         </p>
 
 
@@ -603,6 +972,10 @@
                                 Posts
                             </th>
 
+                            <th>
+                                Contribution %
+                            </th>
+
                         </tr>
 
                     </thead>
@@ -610,44 +983,64 @@
 
                     <tbody>
 
-                        @foreach($users as $user)
+                    @foreach($users as $user)
 
-                            <tr>
+                        <tr>
 
-                                <td>
-                                    {{ $loop->iteration }}
-                                </td>
+                            <td>
+                                {{ $loop->iteration }}
+                            </td>
 
-                                <td>
 
-                                    <strong>
-                                        {{ $user->name }}
-                                    </strong>
+                            <td>
+                                <strong>
+                                    {{ $user->name }}
+                                </strong>
+                            </td>
 
-                                </td>
 
-                                <td>
-                                    {{ $user->email }}
-                                </td>
+                            <td>
+                                {{ $user->email }}
+                            </td>
 
-                                <td>
 
-                                    <span class="badge-custom">
+                            <td>
 
-                                        {{ $user->posts_count }}
+                                <span class="badge-custom">
 
-                                        {{ $user->posts_count == 1
-                                            ? 'Post'
-                                            : 'Posts'
-                                        }}
+                                    {{ $user->posts_count }}
 
-                                    </span>
+                                </span>
 
-                                </td>
+                            </td>
 
-                            </tr>
 
-                        @endforeach
+                            <td>
+
+                                <div class="contribution-bar">
+
+                                    <div class="small-text">
+
+                                        {{ $user->contribution_percentage }}%
+
+                                    </div>
+
+                                    <div class="progress">
+
+                                        <div
+                                            class="progress-bar"
+                                            style="width: {{ min($user->contribution_percentage, 100) }}%;"
+                                        ></div>
+
+                                    </div>
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                    @endforeach
 
                     </tbody>
 
@@ -658,9 +1051,7 @@
         @else
 
             <div class="empty">
-
-                No users found for this country.
-
+                No users found.
             </div>
 
         @endif
@@ -670,11 +1061,272 @@
 </div>
 
 
-<!-- Bootstrap JS -->
+<!-- =========================
+     POST DETAILS MODAL
+========================== -->
+
+<div
+    class="modal fade"
+    id="postModal"
+    tabindex="-1"
+    aria-hidden="true"
+>
+
+    <div class="modal-dialog">
+
+        <div class="modal-content">
+
+
+            <div class="modal-header">
+
+                <h5 class="modal-title">
+                    📋 Post Details
+                </h5>
+
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                ></button>
+
+            </div>
+
+
+            <div class="modal-body">
+
+
+                <div class="mb-3">
+
+                    <label class="fw-bold">
+                        Post ID
+                    </label>
+
+                    <div id="modalPostId">
+                        -
+                    </div>
+
+                </div>
+
+
+                <div class="mb-3">
+
+                    <label class="fw-bold">
+                        Post Name
+                    </label>
+
+                    <div id="modalPostName">
+                        -
+                    </div>
+
+                </div>
+
+
+                <div class="mb-3">
+
+                    <label class="fw-bold">
+                        Author
+                    </label>
+
+                    <div id="modalAuthor">
+                        -
+                    </div>
+
+                </div>
+
+
+                <div class="mb-3">
+
+                    <label class="fw-bold">
+                        Author Email
+                    </label>
+
+                    <div id="modalEmail">
+                        -
+                    </div>
+
+                </div>
+
+
+                <div class="mb-3">
+
+                    <label class="fw-bold">
+                        Country
+                    </label>
+
+                    <div id="modalCountry">
+                        -
+                    </div>
+
+                </div>
+
+
+                <div class="mb-3">
+
+                    <label class="fw-bold">
+                        Created Date
+                    </label>
+
+                    <div id="modalDate">
+                        -
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="modal-footer">
+
+                <button
+                    type="button"
+                    class="btn btn-secondary"
+                    data-bs-dismiss="modal"
+                >
+                    Close
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- Bootstrap -->
 
 <script
     src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
 ></script>
 
+
+<script>
+
+/*
+|--------------------------------------------------------------------------
+| Monthly Post Activity Chart
+|--------------------------------------------------------------------------
+*/
+
+const chartLabels = @json($chartLabels);
+
+const chartData = @json($chartData);
+
+const chartElement =
+    document.getElementById('postActivityChart');
+
+
+new Chart(chartElement, {
+
+    type: 'line',
+
+    data: {
+
+        labels: chartLabels,
+
+        datasets: [
+
+            {
+                label: 'Posts',
+
+                data: chartData,
+
+                borderWidth: 3,
+
+                tension: 0.3,
+
+                fill: true
+            }
+
+        ]
+
+    },
+
+    options: {
+
+        responsive: true,
+
+        maintainAspectRatio: false,
+
+        plugins: {
+
+            legend: {
+                display: true
+            }
+
+        },
+
+        scales: {
+
+            y: {
+
+                beginAtZero: true,
+
+                ticks: {
+                    precision: 0
+                }
+
+            }
+
+        }
+
+    }
+
+});
+
+
+/*
+|--------------------------------------------------------------------------
+| Post Details Modal
+|--------------------------------------------------------------------------
+*/
+
+const postModal =
+    document.getElementById('postModal');
+
+
+postModal.addEventListener(
+    'show.bs.modal',
+    function (event) {
+
+        const button = event.relatedTarget;
+
+
+        document.getElementById('modalPostId')
+            .textContent =
+            button.getAttribute('data-id');
+
+
+        document.getElementById('modalPostName')
+            .textContent =
+            button.getAttribute('data-name');
+
+
+        document.getElementById('modalAuthor')
+            .textContent =
+            button.getAttribute('data-author');
+
+
+        document.getElementById('modalEmail')
+            .textContent =
+            button.getAttribute('data-email');
+
+
+        document.getElementById('modalCountry')
+            .textContent =
+            button.getAttribute('data-country');
+
+
+        document.getElementById('modalDate')
+            .textContent =
+            button.getAttribute('data-date');
+
+    }
+);
+
+</script>
+
 </body>
+
 </html>
