@@ -65,7 +65,7 @@
 
         .summary-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(5, 1fr);
             gap: 20px;
             margin-bottom: 25px;
         }
@@ -198,7 +198,7 @@
         @media (max-width: 900px) {
 
             .summary-grid {
-                grid-template-columns: 1fr;
+                grid-template-columns: repeat(2, 1fr);
             }
 
         }
@@ -292,6 +292,90 @@
             <span class="label">
                 Total Posts
             </span>
+
+         </div>
+
+
+         <div class="summary-card">
+
+            <div class="icon">📊</div>
+
+            <span class="number">
+                {{ $avgPostsPerUser }}
+            </span>
+
+            <span class="label">
+                Avg Posts / User
+            </span>
+
+        </div>
+
+
+        <div class="summary-card">
+
+            <div class="icon">📈</div>
+
+            <span class="number">
+                {{ $yoyGrowth >= 0 ? '+' : '' }}{{ $yoyGrowth }}%
+            </span>
+
+            <span class="label">
+                YoY Growth
+            </span>
+
+        </div>
+
+
+         <div class="summary-card">
+
+            <div class="icon">🏆</div>
+
+            <span class="number">
+                {{ $currentYearPosts }}
+            </span>
+
+            <span class="label">
+                Posts (This Year)
+            </span>
+
+         </div>
+
+    </div>
+
+
+    <!-- CHARTS -->
+
+    <div class="section">
+
+        <div class="section-header">
+
+            <h2>
+                📊 Country Post Distribution
+            </h2>
+
+            <p>
+                Visual breakdown of posts across countries.
+            </p>
+
+        </div>
+
+        <div class="row g-3 mt-2">
+
+            <div class="col-md-6">
+
+                <div class="bg-white p-4 rounded-lg shadow-sm" style="height: 380px;">
+                    <canvas id="barChart"></canvas>
+                </div>
+
+            </div>
+
+            <div class="col-md-6">
+
+                <div class="bg-white p-4 rounded-lg shadow-sm" style="height: 380px;">
+                    <canvas id="pieChart"></canvas>
+                </div>
+
+            </div>
 
         </div>
 
@@ -577,6 +661,104 @@
     </div>
 
 
+    <!-- TOP CONTRIBUTORS -->
+
+    <div class="section">
+
+        <div class="section-header">
+
+            <h2>
+                🏆 Top 10 Contributors
+            </h2>
+
+            <p>
+                Most active users across all countries by post count.
+            </p>
+
+        </div>
+
+        @if($topContributors->count())
+
+            <div class="table-responsive">
+
+                <table class="table table-hover">
+
+                    <thead class="table-light">
+
+                        <tr>
+
+                            <th>
+                                Rank
+                            </th>
+
+                            <th>
+                                User
+                            </th>
+
+                            <th>
+                                Country
+                            </th>
+
+                            <th>
+                                Posts
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        @foreach($topContributors as $user)
+
+                            <tr>
+
+                                <td>
+                                    <strong>
+                                        #{{ $loop->iteration }}
+                                    </strong>
+                                </td>
+
+                                <td>
+                                    <span class="country-name">
+                                        {{ $user->name }}
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <span class="count-badge">
+                                        {{ $user->country->name ?? 'N/A' }}
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <span class="post-badge">
+                                        {{ $user->posts_count }}
+                                        {{ $user->posts_count == 1 ? 'Post' : 'Posts' }}
+                                    </span>
+                                </td>
+
+                            </tr>
+
+                        @endforeach
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        @else
+
+            <div class="empty">
+                No contributors found.
+            </div>
+
+        @endif
+
+    </div>
+
+
     <!-- EXPLANATION -->
 
     <div class="section">
@@ -647,6 +829,68 @@
 <script
     src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
 ></script>
+
+<script
+    src="https://cdn.jsdelivr.net/npm/chart.js"
+></script>
+
+<script>
+
+const barCtx = document.getElementById('barChart');
+
+new Chart(barCtx, {
+    type: 'bar',
+    data: {
+        labels: @json($chartLabels),
+        datasets: [{
+            label: 'Posts',
+            data: @json($chartData),
+            backgroundColor: '#2563eb',
+            borderColor: '#1d4ed8',
+            borderWidth: 1
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+       plugins: {
+            legend: { display: false },
+            title: {
+                display: true,
+                text: 'Posts by Country'
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: { precision: 0 }
+            }
+        }
+    }
+});
+
+const pieCtx = document.getElementById('pieChart');
+
+new Chart(pieCtx, {
+    type: 'pie',
+    data: {
+        labels: @json($pieLabels),
+        datasets: [{
+            label: 'Posts Share',
+            data: @json($pieData),
+            backgroundColor: ['#2563eb', '#198754', '#ffc107', '#dc3545', '#6f42c1', '#fd7e14', '#20c997']
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: { position: 'right' }
+        }
+    }
+});
+
+</script>
 
 </body>
 
