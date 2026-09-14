@@ -3,8 +3,8 @@
 namespace Database\Seeders;
 
 use App\Models\Country;
-use App\Models\User;
 use App\Models\Post;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -33,7 +33,6 @@ class DatabaseSeeder extends Seeder
             'name' => 'Canada',
         ]);
 
-
         /*
         |--------------------------------------------------------------------------
         | India Users
@@ -45,6 +44,7 @@ class DatabaseSeeder extends Seeder
             'email' => 'harry@example.com',
             'password' => Hash::make('123456'),
             'country_id' => $india->id,
+            'email_verified_at' => now(),
         ]);
 
         $rahul = User::create([
@@ -52,6 +52,7 @@ class DatabaseSeeder extends Seeder
             'email' => 'rahul@example.com',
             'password' => Hash::make('123456'),
             'country_id' => $india->id,
+            'email_verified_at' => now(),
         ]);
 
         $priya = User::create([
@@ -59,8 +60,8 @@ class DatabaseSeeder extends Seeder
             'email' => 'priya@example.com',
             'password' => Hash::make('123456'),
             'country_id' => $india->id,
+            'email_verified_at' => now(),
         ]);
-
 
         /*
         |--------------------------------------------------------------------------
@@ -73,6 +74,7 @@ class DatabaseSeeder extends Seeder
             'email' => 'john@example.com',
             'password' => Hash::make('123456'),
             'country_id' => $usa->id,
+            'email_verified_at' => now(),
         ]);
 
         $michael = User::create([
@@ -80,8 +82,8 @@ class DatabaseSeeder extends Seeder
             'email' => 'michael@example.com',
             'password' => Hash::make('123456'),
             'country_id' => $usa->id,
+            'email_verified_at' => now(),
         ]);
-
 
         /*
         |--------------------------------------------------------------------------
@@ -94,6 +96,7 @@ class DatabaseSeeder extends Seeder
             'email' => 'alex@example.com',
             'password' => Hash::make('123456'),
             'country_id' => $canada->id,
+            'email_verified_at' => now(),
         ]);
 
         $sarah = User::create([
@@ -101,8 +104,8 @@ class DatabaseSeeder extends Seeder
             'email' => 'sarah@example.com',
             'password' => Hash::make('123456'),
             'country_id' => $canada->id,
+            'email_verified_at' => now(),
         ]);
-
 
         /*
         |--------------------------------------------------------------------------
@@ -140,7 +143,6 @@ class DatabaseSeeder extends Seeder
             ]);
         }
 
-
         /*
         |--------------------------------------------------------------------------
         | USA Posts
@@ -165,7 +167,6 @@ class DatabaseSeeder extends Seeder
             ]);
         }
 
-
         /*
         |--------------------------------------------------------------------------
         | Canada Posts
@@ -189,7 +190,6 @@ class DatabaseSeeder extends Seeder
             ]);
         }
 
-
         /*
         |--------------------------------------------------------------------------
         | Success Message
@@ -200,5 +200,14 @@ class DatabaseSeeder extends Seeder
         $this->command->info('Countries: 3');
         $this->command->info('Users: 7');
         $this->command->info('Posts: 23');
+        $this->command->info('');
+        $this->command->info('Login Credentials (Password: 123456):');
+        $this->command->info('  - harry@example.com (India)');
+        $this->command->info('  - rahul@example.com (India)');
+        $this->command->info('  - priya@example.com (India)');
+        $this->command->info('  - john@example.com (USA)');
+        $this->command->info('  - michael@example.com (USA)');
+        $this->command->info('  - alex@example.com (Canada)');
+        $this->command->info('  - sarah@example.com (Canada)');
     }
 }
