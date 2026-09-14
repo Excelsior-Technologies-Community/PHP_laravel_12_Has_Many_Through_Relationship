@@ -323,27 +323,64 @@
             </a>
 
 
-            <a
-                href="{{ route(
-                    'country.posts.export',
-                    $country->id
-                ) . '?' . http_build_query([
-                    'search' => $search,
-                    'from_date' => $fromDate,
-                    'to_date' => $toDate,
-                ]) }}"
-                class="btn-custom export-btn"
-            >
-                📥 Export CSV
-            </a>
-
-
             <button
                 onclick="window.print()"
-                class="btn-custom print-btn"
+                class="btn-custom print-btn no-print"
             >
                 🖨️ Print Report
             </button>
+
+            <div class="dropdown no-print">
+                <button class="btn-custom export-btn dropdown-toggle"
+                    type="button" id="exportDropdown"
+                    data-bs-toggle="dropdown" aria-expanded="false">
+                    📥 Export
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="exportDropdown">
+                    <li>
+                        <a href="{{ route('country.posts.export.csv', $country->id) . '?' . http_build_query([
+                            'search' => $search, 'from_date' => $fromDate, 'to_date' => $toDate,
+                            'user_id' => $userId, 'date_preset' => $datePreset,
+                            'sort_by' => $sortBy, 'sort_dir' => $sortDir,
+                        ]) }}"
+                            class="dropdown-item">
+                            📄 CSV
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('country.posts.export.pdf', $country->id) . '?' . http_build_query([
+                            'search' => $search, 'from_date' => $fromDate, 'to_date' => $toDate,
+                            'user_id' => $userId, 'date_preset' => $datePreset,
+                            'sort_by' => $sortBy, 'sort_dir' => $sortDir,
+                        ]) }}"
+                            class="dropdown-item">
+                            📄 PDF
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('country.posts.export.excel', $country->id) . '?' . http_build_query([
+                            'search' => $search, 'from_date' => $fromDate, 'to_date' => $toDate,
+                            'user_id' => $userId, 'date_preset' => $datePreset,
+                            'sort_by' => $sortBy, 'sort_dir' => $sortDir,
+                            'format' => 'xlsx',
+                        ]) }}"
+                            class="dropdown-item">
+                            📊 Excel (XLSX)
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('country.posts.export.excel', $country->id) . '?' . http_build_query([
+                            'search' => $search, 'from_date' => $fromDate, 'to_date' => $toDate,
+                            'user_id' => $userId, 'date_preset' => $datePreset,
+                            'sort_by' => $sortBy, 'sort_dir' => $sortDir,
+                            'format' => 'csv',
+                        ]) }}"
+                            class="dropdown-item">
+                            📊 Excel (CSV)
+                        </a>
+                    </li>
+                </ul>
+            </div>
 
         </div>
 
@@ -434,8 +471,8 @@
 
 
     <!-- =========================
-         DATE + SEARCH FILTER
-    ========================== -->
+         SEARCH & FILTER
+     ========================== -->
 
     <div class="section no-print">
 
@@ -444,7 +481,7 @@
         </h2>
 
         <p>
-            Filter posts by name and created date.
+            Filter posts by name, author email, user, date range, or sort.
         </p>
 
 
@@ -460,13 +497,12 @@
 
                 <div class="row g-3">
 
+                    <!-- Search (post name + author email) -->
 
-                    <!-- Search -->
-
-                    <div class="col-md-4">
+                    <div class="col-md-3">
 
                         <label class="form-label">
-                            Search Post
+                            Search
                         </label>
 
                         <input
@@ -474,15 +510,92 @@
                             name="search"
                             value="{{ $search }}"
                             class="form-control"
-                            placeholder="Search post name..."
+                            placeholder="Post name or author email..."
                         >
 
                     </div>
 
+                    <!-- User Filter -->
 
-                    <!-- From -->
+                    <div class="col-md-2">
 
-                    <div class="col-md-3">
+                        <label class="form-label">
+                            Filter by User
+                        </label>
+
+                        <select
+                            name="user_id"
+                            class="form-select"
+                        >
+
+                            <option value="">
+                                All Users
+                            </option>
+
+                            @foreach($users as $u)
+
+                                <option
+                                    value="{{ $u->id }}"
+                                    {{ ($userId ?? '') == $u->id ? 'selected' : '' }}
+                                >
+                                    {{ $u->name }}
+                                    ({{ $u->posts_count }})
+                                </option>
+
+                            @endforeach
+
+                        </select>
+
+                    </div>
+
+                    <!-- Date Presets -->
+
+                    <div class="col-md-2">
+
+                        <label class="form-label">
+                            Date Preset
+                        </label>
+
+                        <select
+                            name="date_preset"
+                            class="form-select"
+                        >
+
+                            <option
+                                value="all"
+                                {{ ($datePreset ?? 'all') === 'all' ? 'selected' : '' }}
+                            >
+                                All Time
+                            </option>
+
+                            <option
+                                value="7d"
+                                {{ ($datePreset ?? 'all') === '7d' ? 'selected' : '' }}
+                            >
+                                Last 7 Days
+                            </option>
+
+                            <option
+                                value="30d"
+                                {{ ($datePreset ?? 'all') === '30d' ? 'selected' : '' }}
+                            >
+                                Last 30 Days
+                            </option>
+
+                            <option
+                                value="this_year"
+                                {{ ($datePreset ?? 'all') === 'this_year' ? 'selected' : '' }}
+                            >
+                                This Year
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                    <!-- From / To Date -->
+
+                    <div class="col-md-2">
 
                         <label class="form-label">
                             From Date
@@ -497,10 +610,7 @@
 
                     </div>
 
-
-                    <!-- To -->
-
-                    <div class="col-md-3">
+                    <div class="col-md-2">
 
                         <label class="form-label">
                             To Date
@@ -515,40 +625,98 @@
 
                     </div>
 
+                    <!-- Sort Options -->
 
-                    <!-- Buttons -->
+                    <div class="col-md-1">
 
-                    <div class="col-md-2 d-flex align-items-end gap-2">
+                        <label class="form-label">
+                            Sort By
+                        </label>
 
-                        <button
-                            type="submit"
-                            class="btn btn-primary w-100"
+                        <select
+                            name="sort_by"
+                            class="form-select"
                         >
-                            Filter
-                        </button>
+
+                            <option
+                                value="created_at"
+                                {{ ($sortBy ?? 'created_at') === 'created_at' ? 'selected' : '' }}
+                            >
+                                Date
+                            </option>
+
+                            <option
+                                value="name"
+                                {{ ($sortBy ?? 'created_at') === 'name' ? 'selected' : '' }}
+                            >
+                                Name
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                    <div class="col-md-1">
+
+                        <label class="form-label">
+                            Order
+                        </label>
+
+                        <select
+                            name="sort_dir"
+                            class="form-select"
+                        >
+
+                            <option
+                                value="desc"
+                                {{ ($sortDir ?? 'desc') === 'desc' ? 'selected' : '' }}
+                            >
+                                Desc
+                            </option>
+
+                            <option
+                                value="asc"
+                                {{ ($sortDir ?? 'desc') === 'asc' ? 'selected' : '' }}
+                            >
+                                Asc
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                    <!-- Filter Button -->
+
+                    <div class="col-md-12 d-flex align-items-end justify-content-end">
+
+                        <div class="d-flex gap-2">
+
+                            <button
+                                type="submit"
+                                class="btn btn-primary"
+                            >
+                                Apply Filters
+                            </button>
+
+                            @if($search || $fromDate || $toDate || $datePreset !== 'all' || $userId || $sortBy !== 'created_at' || $sortDir !== 'desc')
+
+                                <a
+                                    href="{{ route(
+                                        'country.posts.details',
+                                        $country->id
+                                    ) }}"
+                                    class="btn btn-secondary"
+                                >
+                                    Clear Filters
+                                </a>
+
+                            @endif
+
+                        </div>
 
                     </div>
 
                 </div>
-
-
-                @if($search || $fromDate || $toDate)
-
-                    <div class="mt-3">
-
-                        <a
-                            href="{{ route(
-                                'country.posts.details',
-                                $country->id
-                            ) }}"
-                            class="btn btn-secondary"
-                        >
-                            Clear Filters
-                        </a>
-
-                    </div>
-
-                @endif
 
             </form>
 
@@ -787,6 +955,10 @@
                             </th>
 
                             <th>
+                                Email
+                            </th>
+
+                            <th>
                                 Created
                             </th>
 
@@ -824,6 +996,17 @@
                                 <span class="badge-custom">
 
                                     {{ $post->user->name ?? 'N/A' }}
+
+                                </span>
+
+                            </td>
+
+
+                            <td>
+
+                                <span class="badge-custom">
+
+                                    {{ $post->user->email ?? 'N/A' }}
 
                                 </span>
 

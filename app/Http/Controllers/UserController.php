@@ -3,438 +3,105 @@
 namespace App\Http\Controllers;
 
 use App\Models\Country;
-use App\Models\Post;
-use Carbon\Carbon;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
-    /**
-     * Country Dashboard
-     *
-     * Features:
-     * - Country search
-     * - Country ranking by posts/users
-     * - Total users
-     * - Total posts
-     * - Post percentage
-     * - Top contributor
-     */
     public function index(Request $request)
     {
         $search = $request->input('search');
-        $sort = $request->input('sort', 'posts');
 
-        $totalPosts = Post::count();
-
-        $countriesQuery = Country::withCount([
-            'users',
-            'posts',
-        ])
-        ->with([
-            'users' => function ($query) {
-                $query
-                    ->withCount('posts')
-                    ->orderByDesc('posts_count')
-                    ->orderBy('name');
-            },
-        ]);
-
-        /**
-         * Country search.
-         */
-        if (!empty($search)) {
-            $countriesQuery->where('name', 'like', '%' . $search . '%');
-        }
-
-        /**
-         * Country ranking.
-         *
-         * posts = rank by total posts
-         * users = rank by total users
-         */
-        if ($sort === 'users') {
-            $countriesQuery
-                ->orderByDesc('users_count')
-                ->orderBy('name');
-        } else {
-            $countriesQuery
-                ->orderByDesc('posts_count')
-                ->orderBy('name');
-        }
-
-        $countries = $countriesQuery->get();
-
-        /**
-         * Add analytics.
-         */
-        $countries->each(function ($country) use ($totalPosts) {
-
-            $country->post_percentage = $totalPosts > 0
-                ? round(
-                    ($country->posts_count / $totalPosts) * 100,
-                    1
-                )
-                : 0;
-
-            $country->top_user = $country->users->first();
-
-            $country->top_user_posts = $country->top_user
-                ? $country->top_user->posts_count
-                : 0;
-        });
-
-        return view('country-posts', compact(
-            'countries',
-            'totalPosts',
-            'search',
-            'sort'
-        ));
-    }
-
-
-    /**
-     * Country Details
-     *
-     * Features:
-     * - Post search
-     * - Date range filtering
-     * - Pagination
-     * - User contribution percentage
-     * - Growth analytics
-     * - Most active user
-     * - Monthly chart
-     * - Post details modal
-     */
-    public function countryPosts(Request $request, $countryId)
-    {
-        $country = Country::withCount([
-            'users',
-            'posts',
-        ])->findOrFail($countryId);
-
-        /**
-         * Filters.
-         */
-        $search = $request->input('search');
-
-        $fromDate = $request->input('from_date');
-
-        $toDate = $request->input('to_date');
-
-        /**
-         * Main hasManyThrough query.
-         *
-         * Country → Users → Posts
-         */
-        $postsQuery = $country->posts()
-            ->with('user')
-            ->latest();
-
-        /**
-         * Search post name.
-         */
-        if (!empty($search)) {
-            $postsQuery->where(
-                'posts.name',
-                'like',
-                '%' . $search . '%'
-            );
-        }
-
-        /**
-         * From date filter.
-         */
-        if (!empty($fromDate)) {
-            $postsQuery->whereDate(
-                'posts.created_at',
-                '>=',
-                $fromDate
-            );
-        }
-
-        /**
-         * To date filter.
-         */
-        if (!empty($toDate)) {
-            $postsQuery->whereDate(
-                'posts.created_at',
-                '<=',
-                $toDate
-            );
-        }
-
-        /**
-         * Pagination.
-         */
-        $posts = $postsQuery
-            ->paginate(5)
+        $users = User::with('country')
+            ->withCount('posts')
+            ->when($search, function ($q, $search) {
+                $q->where('name', 'like', '%'.$search.'%')
+                    ->orWhere('email', 'like', '%'.$search.'%');
+            })
+            ->orderBy('name')
+            ->paginate(10)
             ->withQueryString();
 
-        /**
-         * Users and contribution percentage.
-         */
-        $users = $country->users()
-            ->withCount('posts')
-            ->orderByDesc('posts_count')
-            ->orderBy('name')
-            ->get();
-
-        /**
-         * Calculate user contribution percentage.
-         */
-        $users->each(function ($user) use ($country) {
-
-            $user->contribution_percentage =
-                $country->posts_count > 0
-                    ? round(
-                        ($user->posts_count / $country->posts_count) * 100,
-                        1
-                    )
-                    : 0;
-        });
-
-        /**
-         * Most active user.
-         */
-        $mostActiveUser = $users->first();
-
-        /**
-         * Current month.
-         */
-        $currentMonthStart = Carbon::now()
-            ->startOfMonth();
-
-        $currentMonthEnd = Carbon::now()
-            ->endOfMonth();
-
-        /**
-         * Previous month.
-         */
-        $previousMonthStart = Carbon::now()
-            ->subMonth()
-            ->startOfMonth();
-
-        $previousMonthEnd = Carbon::now()
-            ->subMonth()
-            ->endOfMonth();
-
-        /**
-         * Current month posts.
-         */
-        $currentMonthPosts = $country->posts()
-            ->whereBetween(
-                'posts.created_at',
-                [
-                    $currentMonthStart,
-                    $currentMonthEnd,
-                ]
-            )
-            ->count();
-
-        /**
-         * Previous month posts.
-         */
-        $previousMonthPosts = $country->posts()
-            ->whereBetween(
-                'posts.created_at',
-                [
-                    $previousMonthStart,
-                    $previousMonthEnd,
-                ]
-            )
-            ->count();
-
-        /**
-         * Growth percentage.
-         */
-        if ($previousMonthPosts > 0) {
-
-            $growthPercentage = round(
-                (
-                    ($currentMonthPosts - $previousMonthPosts)
-                    / $previousMonthPosts
-                ) * 100,
-                1
-            );
-
-        } elseif ($currentMonthPosts > 0) {
-
-            $growthPercentage = 100;
-
-        } else {
-
-            $growthPercentage = 0;
-        }
-
-        /**
-         * Monthly activity chart.
-         *
-         * Last 12 months.
-         */
-        $chartLabels = [];
-
-        $chartData = [];
-
-        for ($i = 11; $i >= 0; $i--) {
-
-            $month = Carbon::now()
-                ->subMonths($i);
-
-            $start = $month->copy()->startOfMonth();
-
-            $end = $month->copy()->endOfMonth();
-
-            $count = $country->posts()
-                ->whereBetween(
-                    'posts.created_at',
-                    [$start, $end]
-                )
-                ->count();
-
-            $chartLabels[] = $month->format('M Y');
-
-            $chartData[] = $count;
-        }
-
-        /**
-         * Return page.
-         */
-        return view('country-details', compact(
-            'country',
-            'posts',
-            'users',
-            'search',
-            'fromDate',
-            'toDate',
-            'mostActiveUser',
-            'currentMonthPosts',
-            'previousMonthPosts',
-            'growthPercentage',
-            'chartLabels',
-            'chartData'
-        ));
+        return view('users.index', compact('users', 'search'));
     }
 
-
-    /**
-     * CSV Export
-     *
-     * Exports selected country's post report.
-     *
-     * Includes:
-     * - Post
-     * - Author
-     * - Country
-     * - Created date
-     */
-    public function exportCsv(Request $request, $countryId)
+    public function create()
     {
-        $country = Country::findOrFail($countryId);
+        $countries = Country::orderBy('name')->get();
 
-        $search = $request->input('search');
+        return view('users.create', compact('countries'));
+    }
 
-        $fromDate = $request->input('from_date');
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'country_id' => ['required', 'exists:countries,id'],
+        ]);
 
-        $toDate = $request->input('to_date');
+        $user = User::create([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'password' => Hash::make($validated['password']),
+            'country_id' => $validated['country_id'],
+        ]);
 
-        /**
-         * Same filtering used by the page.
-         */
-        $postsQuery = $country->posts()
-            ->with('user')
-            ->latest();
+        return redirect()
+            ->route('users.index')
+            ->with('success', 'User "'.$user->name.'" created successfully.');
+    }
 
-        /**
-         * Search.
-         */
-        if (!empty($search)) {
-            $postsQuery->where(
-                'posts.name',
-                'like',
-                '%' . $search . '%'
-            );
+    public function show(User $user)
+    {
+        $user->load(['country', 'posts']);
+        $user->posts_count = $user->posts->count();
+
+        return view('users.show', compact('user'));
+    }
+
+    public function edit(User $user)
+    {
+        $countries = Country::orderBy('name')->get();
+
+        return view('users.edit', compact('user', 'countries'));
+    }
+
+    public function update(Request $request, User $user)
+    {
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
+            'password' => ['nullable', 'string', 'min:8', 'confirmed'],
+            'country_id' => ['required', 'exists:countries,id'],
+        ]);
+
+        $user->update([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'country_id' => $validated['country_id'],
+        ]);
+
+        if (! empty($validated['password'])) {
+            $user->update(['password' => Hash::make($validated['password'])]);
         }
 
-        /**
-         * From date.
-         */
-        if (!empty($fromDate)) {
-            $postsQuery->whereDate(
-                'posts.created_at',
-                '>=',
-                $fromDate
-            );
-        }
+        return redirect()
+            ->route('users.index')
+            ->with('success', 'User "'.$user->name.'" updated successfully.');
+    }
 
-        /**
-         * To date.
-         */
-        if (!empty($toDate)) {
-            $postsQuery->whereDate(
-                'posts.created_at',
-                '<=',
-                $toDate
-            );
-        }
+    public function destroy(User $user)
+    {
+        $userName = $user->name;
 
-        $posts = $postsQuery->get();
+        $user->delete();
 
-        /**
-         * CSV filename.
-         */
-        $filename = strtolower(
-            str_replace(
-                ' ',
-                '-',
-                $country->name
-            )
-        ) . '-post-report.csv';
-
-        /**
-         * Stream CSV.
-         */
-        return response()->streamDownload(
-            function () use ($posts, $country) {
-
-                $file = fopen('php://output', 'w');
-
-                /**
-                 * Header.
-                 */
-                fputcsv($file, [
-                    'Post ID',
-                    'Post Name',
-                    'Author',
-                    'Author Email',
-                    'Country',
-                    'Created Date',
-                ]);
-
-                /**
-                 * Rows.
-                 */
-                foreach ($posts as $post) {
-
-                    fputcsv($file, [
-                        $post->id,
-                        $post->name,
-                        $post->user->name ?? 'N/A',
-                        $post->user->email ?? 'N/A',
-                        $country->name,
-                        $post->created_at
-                            ? $post->created_at->format('Y-m-d H:i:s')
-                            : '',
-                    ]);
-                }
-
-                fclose($file);
-
-            },
-            $filename,
-            [
-                'Content-Type' => 'text/csv',
-            ]
-        );
+        return redirect()
+            ->route('users.index')
+            ->with('success', 'User "'.$userName.'" deleted successfully.');
     }
 }

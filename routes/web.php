@@ -1,47 +1,43 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\CountryController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\PostController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
+use Illuminate\Support\Facades\Route;
 
-/*
-|--------------------------------------------------------------------------
-| Has Many Through Relationship Routes
-|--------------------------------------------------------------------------
-*/
+Route::get('/', function () {
+    return view('welcome');
+});
 
-/**
- * Country dashboard.
- *
- * Search countries
- * Country ranking
- * User/post statistics
- */
-Route::get('/country-posts', [UserController::class, 'index'])
-    ->name('country.posts');
+Route::middleware(['auth', 'verified'])->group(function () {
 
+    Route::get('/dashboard', [DashboardController::class, 'index'])
+        ->name('dashboard');
 
-/**
- * Country details.
- *
- * Search
- * Date filtering
- * Pagination
- * User contributions
- * Growth analytics
- * Most active user
- * Monthly chart
- * Post details
- */
-Route::get(
-    '/country/{country}/posts',
-    [UserController::class, 'countryPosts']
-)->name('country.posts.details');
+    Route::get('/country-posts', [DashboardController::class, 'index'])
+        ->name('country.posts');
 
+    Route::get('/country/{country}/posts', [DashboardController::class, 'countryPosts'])
+        ->name('country.posts.details');
 
-/**
- * CSV export.
- */
-Route::get(
-    '/country/{country}/posts/export',
-    [UserController::class, 'exportCsv']
-)->name('country.posts.export');
+    Route::resource('countries', CountryController::class);
+    Route::resource('users', UserController::class);
+    Route::resource('posts', PostController::class);
+
+    Route::prefix('country/{country}/posts/export')->group(function () {
+        Route::get('/csv', [DashboardController::class, 'exportCsv'])
+            ->name('country.posts.export.csv');
+        Route::get('/pdf', [DashboardController::class, 'exportPdf'])
+            ->name('country.posts.export.pdf');
+        Route::get('/excel', [DashboardController::class, 'exportExcel'])
+            ->name('country.posts.export.excel');
+    });
+
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+
+require __DIR__.'/auth.php';
